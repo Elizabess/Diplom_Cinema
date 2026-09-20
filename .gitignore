@@ -6,4 +6,4 @@
 .DS_Store
 .idea/
 .vscode/
-*.log
+*.logconfig/database.example.php
