@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+echo '<!doctype html>';
+echo '<html lang="ru">';
+echo '<head>';
+echo '<meta charset="UTF-8">';
+echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+echo '<title>РљРёРЅРѕС‚РµР°С‚СЂ</title>';
+echo '</head>';
+echo '<body>';
+
+echo '<h1>РЎРёСЃС‚РµРјР° Р±СЂРѕРЅРёСЂРѕРІР°РЅРёСЏ Р±РёР»РµС‚РѕРІ РІ РєРёРЅРѕС‚РµР°С‚СЂ</h1>';
+
+echo '<p>Р“Р»Р°РІРЅР°СЏ СЃС‚СЂР°РЅРёС†Р° РїСЂРѕРµРєС‚Р° СЂР°Р±РѕС‚Р°РµС‚.</p>';
+
+echo '<nav>';
+echo '<ul>';
+echo '<li><a href="?page=health">РџСЂРѕРІРµСЂРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ</a></li>';
+echo '<li><a href="?page=tables">РЎРїРёСЃРѕРє С‚Р°Р±Р»РёС† Р±Р°Р·С‹ РґР°РЅРЅС‹С…</a></li>';
+echo '</ul>';
+echo '</nav>';
+
+echo '</body>';
+echo '</html>';
