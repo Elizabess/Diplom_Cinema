@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
+session_start();
 
 header('Content-Type: text/html; charset=utf-8');
-
-use PDO;
 
 $page = $_GET['page'] ?? 'home';
 
@@ -72,6 +71,19 @@ function renderClientView(string $filename): void
     require $path;
 }
 
+function requireAdmin(): array
+{
+    if (empty($_SESSION['admin_user_id'])) {
+	header('Location: /?page=login');
+	exit;
+    }
+
+    return [
+	'id' => (int) $_SESSION['admin_user_id'],
+	'name' => (string) ($_SESSION['admin_user_name'] ?? ''),
+    ];
+}
+
 switch ($page) {
     case 'health':
         renderLayoutStart('Проверка приложения');
@@ -129,6 +141,68 @@ switch ($page) {
     case 'ticket':
         renderClientView('ticket.html');
         break;
+
+    case 'login':
+        $error = '';
+        $email = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = trim((string) ($_POST['email'] ?? ''));
+            $password = (string) ($_POST['password'] ?? '');
+
+            if ($email === '' || $password === '') {
+                $error = 'Введите email и пароль.';
+            } else {
+                try {
+                    $pdo = \App\Database\Connection::get();
+
+                    $statement = $pdo->prepare(
+                        'SELECT id, email, password_hash, role, name
+                         FROM users
+                         WHERE email = :email
+                         LIMIT 1'
+                    );
+
+                    $statement->execute(['email' => $email]);
+                    $user = $statement->fetch();
+
+                    if (
+                        $user === false
+                        || $user['role'] !== 'admin'
+                        || !password_verify($password, $user['password_hash'])
+                    ) {
+                        $error = 'Неверный email или пароль.';
+                    } else {
+                        session_regenerate_id(true);
+
+                        $_SESSION['admin_user_id'] = (int) $user['id'];
+                        $_SESSION['admin_user_name'] = (string) $user['name'];
+
+                        header('Location: /?page=admin');
+                        exit;
+                    }
+                } catch (Throwable $exception) {
+                    $error = 'Ошибка сервера. Попробуйте позже.';
+                }
+            }
+        }
+
+        require __DIR__ . '/../resources/views/admin/login.php';
+        break;
+
+    case 'admin':
+        $admin = requireAdmin();
+
+        $adminName = $admin['name'];
+
+        require __DIR__ . '/../resources/views/admin/dashboard.php';
+        break;
+
+    case 'logout':
+        session_destroy();
+
+        header('Location: /?page=login');
+        exit;
 
     case 'home':
     default:
